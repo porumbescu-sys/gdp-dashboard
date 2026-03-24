@@ -19,7 +19,7 @@ if "score" not in st.session_state:
     st.session_state.current_a = random.randint(2, 9)
     st.session_state.current_b = random.randint(2, 9)
     st.session_state.feedback = ""
-    st.session_state.answer_value = ""  # для хранения значения поля
+    st.session_state.answer_input = ""  # значение поля ввода
 
 st.set_page_config(page_title="Таблица умножения", page_icon="🧸")
 st.title("🧸 Изучаем таблицу умножения")
@@ -30,22 +30,20 @@ col1, col2, col3 = st.columns([1, 1, 1])
 with col2:
     st.header(f"{st.session_state.current_a} × {st.session_state.current_b} = ?")
 
-# Форма для ввода и проверки
-with st.form(key="quiz_form"):
-    # Поле ввода, привязанное к session_state.answer_value
-    user_answer = st.text_input("Твой ответ:", key="answer_input", value=st.session_state.answer_value)
-    submitted = st.form_submit_button("Проверить")
+# Поле ввода, привязанное к session_state
+answer = st.text_input("Твой ответ:", key="answer_input")
 
-if submitted:
-    if user_answer.strip() == "":
+# Кнопка проверки
+if st.button("Проверить"):
+    if answer.strip() == "":
         st.session_state.feedback = "❌ Введи число!"
     else:
         try:
-            answer = int(user_answer)
+            user_num = int(answer)
             st.session_state.total += 1
             correct = st.session_state.current_a * st.session_state.current_b
 
-            if answer == correct:
+            if user_num == correct:
                 st.session_state.score += 1
                 st.balloons()
                 praise = random.choice(praise_phrases)
@@ -58,9 +56,8 @@ if submitted:
         except ValueError:
             st.session_state.feedback = "❌ Введи целое число!"
 
-    # Очищаем значение поля
-    st.session_state.answer_value = ""
-    # Принудительное обновление страницы
+    # Очищаем поле ввода
+    st.session_state.answer_input = ""
     st.rerun()
 
 # Отображение обратной связи
@@ -78,5 +75,5 @@ if st.button("Начать заново"):
     st.session_state.current_a = random.randint(2, 9)
     st.session_state.current_b = random.randint(2, 9)
     st.session_state.feedback = ""
-    st.session_state.answer_value = ""
+    st.session_state.answer_input = ""
     st.rerun()
