@@ -29,9 +29,9 @@ col1, col2, col3 = st.columns([1, 1, 1])
 with col2:
     st.header(f"{st.session_state.current_a} × {st.session_state.current_b} = ?")
 
-# Форма для ввода и проверки
+# Форма для ввода и проверки (без key в text_input)
 with st.form(key="quiz_form"):
-    user_answer = st.text_input("Твой ответ:", key="answer_input")
+    user_answer = st.text_input("Твой ответ:")   # ключ убран
     submitted = st.form_submit_button("Проверить")
 
 if submitted:
@@ -56,7 +56,7 @@ if submitted:
         except ValueError:
             st.session_state.feedback = "❌ Введи целое число!"
 
-    # Принудительно обновляем страницу, чтобы показать новый вопрос
+    # Принудительное обновление страницы
     st.rerun()
 
 # Отображение обратной связи
