@@ -19,6 +19,7 @@ if "score" not in st.session_state:
     st.session_state.current_a = random.randint(2, 9)
     st.session_state.current_b = random.randint(2, 9)
     st.session_state.feedback = ""
+    st.session_state.input_key = 0  # счётчик для ключа поля ввода
 
 st.set_page_config(page_title="Таблица умножения", page_icon="🧸")
 st.title("🧸 Изучаем таблицу умножения")
@@ -29,12 +30,13 @@ col1, col2, col3 = st.columns([1, 1, 1])
 with col2:
     st.header(f"{st.session_state.current_a} × {st.session_state.current_b} = ?")
 
-# Форма — поле без ключа, чтобы автоматически очищалось после отправки
-with st.form(key="quiz_form"):
-    user_answer = st.text_input("Твой ответ:")  # ключ не указан
-    submitted = st.form_submit_button("Проверить")
+# Поле ввода с уникальным ключом
+user_answer = st.text_input(
+    "Твой ответ:",
+    key=f"answer_{st.session_state.input_key}"  # ключ меняется после каждого ответа
+)
 
-if submitted:
+if st.button("Проверить"):
     if user_answer.strip() == "":
         st.session_state.feedback = "❌ Введи число!"
     else:
@@ -56,8 +58,9 @@ if submitted:
         except ValueError:
             st.session_state.feedback = "❌ Введи целое число!"
 
-    # После отправки формы Streamlit автоматически перезапустит скрипт,
-    # и поле ввода (без ключа) будет пустым.
+    # Увеличиваем счётчик, чтобы создать новый ключ для поля ввода
+    st.session_state.input_key += 1
+    st.rerun()
 
 # Отображение обратной связи
 if st.session_state.feedback:
@@ -74,4 +77,5 @@ if st.button("Начать заново"):
     st.session_state.current_a = random.randint(2, 9)
     st.session_state.current_b = random.randint(2, 9)
     st.session_state.feedback = ""
+    st.session_state.input_key += 1  # также меняем ключ при сбросе
     st.rerun()
