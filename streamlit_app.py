@@ -19,7 +19,6 @@ if "score" not in st.session_state:
     st.session_state.current_a = random.randint(2, 9)
     st.session_state.current_b = random.randint(2, 9)
     st.session_state.feedback = ""
-    st.session_state.answer_input = ""  # значение поля ввода
 
 st.set_page_config(page_title="Таблица умножения", page_icon="🧸")
 st.title("🧸 Изучаем таблицу умножения")
@@ -30,20 +29,21 @@ col1, col2, col3 = st.columns([1, 1, 1])
 with col2:
     st.header(f"{st.session_state.current_a} × {st.session_state.current_b} = ?")
 
-# Поле ввода, привязанное к session_state
-answer = st.text_input("Твой ответ:", key="answer_input")
+# Форма — поле без ключа, чтобы автоматически очищалось после отправки
+with st.form(key="quiz_form"):
+    user_answer = st.text_input("Твой ответ:")  # ключ не указан
+    submitted = st.form_submit_button("Проверить")
 
-# Кнопка проверки
-if st.button("Проверить"):
-    if answer.strip() == "":
+if submitted:
+    if user_answer.strip() == "":
         st.session_state.feedback = "❌ Введи число!"
     else:
         try:
-            user_num = int(answer)
+            answer = int(user_answer)
             st.session_state.total += 1
             correct = st.session_state.current_a * st.session_state.current_b
 
-            if user_num == correct:
+            if answer == correct:
                 st.session_state.score += 1
                 st.balloons()
                 praise = random.choice(praise_phrases)
@@ -56,9 +56,8 @@ if st.button("Проверить"):
         except ValueError:
             st.session_state.feedback = "❌ Введи целое число!"
 
-    # Очищаем поле ввода
-    st.session_state.answer_input = ""
-    st.rerun()
+    # После отправки формы Streamlit автоматически перезапустит скрипт,
+    # и поле ввода (без ключа) будет пустым.
 
 # Отображение обратной связи
 if st.session_state.feedback:
@@ -75,5 +74,4 @@ if st.button("Начать заново"):
     st.session_state.current_a = random.randint(2, 9)
     st.session_state.current_b = random.randint(2, 9)
     st.session_state.feedback = ""
-    st.session_state.answer_input = ""
     st.rerun()
