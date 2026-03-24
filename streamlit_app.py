@@ -2,7 +2,6 @@ import streamlit as st
 import random
 
 # ------------------- БАЗА ЗАДАЧ -------------------
-# Список текстовых задач на умножение
 problems = [
     {"text": "В одной коробке 6 карандашей. Сколько карандашей в 4 таких коробках?", "answer": 24},
     {"text": "На одной ветке 5 яблок. Сколько яблок на 3 таких ветках?", "answer": 15},
@@ -16,7 +15,6 @@ problems = [
     {"text": "Один стул стоит 3 рубля. Сколько стоят 6 таких стульев?", "answer": 18}
 ]
 
-# Похвалы с именем
 def get_praise(name):
     praises = [
         f"🎉 Отлично, {name}! Ты просто гений умножения!",
@@ -34,21 +32,17 @@ def get_hint(a, b):
     return f"💡 Подсказка: {a} × {b} = {a} + {a} + ... ({b} раз) = {a * b}"
 
 def check_diploma():
-    """Выдаёт диплом, если общее количество правильных ответов стало кратно 10"""
-    # Проверяем, не перешагнули ли через десяток с прошлого раза
-    # Для этого сохраним количество дипломов и правильных ответов
     if "last_diploma_count" not in st.session_state:
         st.session_state.last_diploma_count = 0
-
-    expected_diplomas = st.session_state.total_correct // 10
-    if expected_diplomas > st.session_state.last_diploma_count:
-        for _ in range(expected_diplomas - st.session_state.last_diploma_count):
+    expected = st.session_state.total_correct // 10
+    if expected > st.session_state.last_diploma_count:
+        for _ in range(expected - st.session_state.last_diploma_count):
             st.session_state.diplomas += 1
             st.balloons()
             st.success(f"🎓 ДИПЛОМ #{st.session_state.diplomas}! 🎓")
             st.markdown(f"### Поздравляем, {st.session_state.name}! Ты получил диплом за 10 правильных ответов!")
             st.markdown("---")
-        st.session_state.last_diploma_count = expected_diplomas
+        st.session_state.last_diploma_count = expected
 
 # Инициализация состояния
 if "name" not in st.session_state:
@@ -72,7 +66,7 @@ if "last_diploma_count" not in st.session_state:
 if "feedback" not in st.session_state:
     st.session_state.feedback = ""
 if "problems_remaining" not in st.session_state:
-    st.session_state.problems_remaining = []  # для режима задач
+    st.session_state.problems_remaining = []
 if "current_problem" not in st.session_state:
     st.session_state.current_problem = None
 
@@ -91,7 +85,6 @@ def generate_test_questions():
     st.session_state.test_questions = questions
 
 def generate_problem():
-    """Выбирает случайную задачу из списка"""
     if not st.session_state.problems_remaining:
         st.session_state.problems_remaining = problems.copy()
         random.shuffle(st.session_state.problems_remaining)
@@ -100,11 +93,12 @@ def generate_problem():
 
 # ------------------- СТРАНИЦЫ -------------------
 def welcome_page():
-    st.set_page_config(page_title="Учим таблицу умножения", page_icon="🧸")
+    st.set_page_config(page_title="Учим таблицу умножения", page_icon="🧸", layout="centered", initial_sidebar_state="collapsed")
     st.title("📚 Добро пожаловать в школу умножения!")
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        st.image("https://cdn-icons-png.flaticon.com/512/1995/1995571.png", width=150)
+        # ЗДЕСЬ КАРТИНКА — заменена на нужную
+        st.image("https://avatars.mds.yandex.net/i?id=2648a0f1b0c2a75695ec3c114bedea26_l-6959671-images-thumbs&n=13", width=150)
         st.markdown("### 👩‍🏫 Здравствуй, маленький ученик!")
         st.markdown("Я твоя учительница, София. Я помогу тебе выучить таблицу умножения.")
         st.markdown("Для начала давай познакомимся. Как тебя зовут?")
@@ -181,7 +175,6 @@ def test_page():
 
     if st.session_state.test_index >= len(st.session_state.test_questions):
         st.success("🎉 Ты ответил на все вопросы! Молодец!")
-        # Дипломы проверяются при возврате в меню
         if st.button("Вернуться в меню"):
             st.session_state.page = "menu"
             st.rerun()
@@ -228,7 +221,6 @@ def problems_page():
 
     problem = st.session_state.current_problem
     if problem is None:
-        # Если задачи закончились, показать сообщение и вернуться в меню
         st.success("🎉 Ты решил все задачи! Молодец!")
         if st.button("Вернуться в меню"):
             st.session_state.page = "menu"
@@ -248,7 +240,6 @@ def problems_page():
                     check_diploma()
                     praise = get_praise(st.session_state.name)
                     st.session_state.feedback = f"✅ {praise}"
-                    # Следующая задача
                     generate_problem()
                 else:
                     st.session_state.feedback = f"❌ Неверно! Правильный ответ: {problem['answer']}."
