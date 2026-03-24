@@ -19,6 +19,7 @@ if "score" not in st.session_state:
     st.session_state.current_a = random.randint(2, 9)
     st.session_state.current_b = random.randint(2, 9)
     st.session_state.feedback = ""
+    st.session_state.answer_value = ""  # для хранения значения поля
 
 st.set_page_config(page_title="Таблица умножения", page_icon="🧸")
 st.title("🧸 Изучаем таблицу умножения")
@@ -29,9 +30,10 @@ col1, col2, col3 = st.columns([1, 1, 1])
 with col2:
     st.header(f"{st.session_state.current_a} × {st.session_state.current_b} = ?")
 
-# Форма для ввода и проверки (без key в text_input)
+# Форма для ввода и проверки
 with st.form(key="quiz_form"):
-    user_answer = st.text_input("Твой ответ:")   # ключ убран
+    # Поле ввода, привязанное к session_state.answer_value
+    user_answer = st.text_input("Твой ответ:", key="answer_input", value=st.session_state.answer_value)
     submitted = st.form_submit_button("Проверить")
 
 if submitted:
@@ -56,6 +58,8 @@ if submitted:
         except ValueError:
             st.session_state.feedback = "❌ Введи целое число!"
 
+    # Очищаем значение поля
+    st.session_state.answer_value = ""
     # Принудительное обновление страницы
     st.rerun()
 
@@ -74,4 +78,5 @@ if st.button("Начать заново"):
     st.session_state.current_a = random.randint(2, 9)
     st.session_state.current_b = random.randint(2, 9)
     st.session_state.feedback = ""
+    st.session_state.answer_value = ""
     st.rerun()
